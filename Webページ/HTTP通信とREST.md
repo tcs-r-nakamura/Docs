@@ -203,7 +203,17 @@ GET /api/orders?status=processing&page=1&limit=20
 
 ```csharp
 // クエリパラメータを付けてリクエスト
+// ❌ NG：特殊文字（スペース・& など）が含まれると URL が壊れる
 var url = $"/api/orders?status={status}&page={page}&limit={limit}";
+
+// ✅ OK：QueryHelpers で安全にエンコードする（Microsoft.AspNetCore.WebUtilities）
+var queryParams = new Dictionary<string, string?>
+{
+    ["status"] = status,
+    ["page"]   = page.ToString(),
+    ["limit"]  = limit.ToString(),
+};
+var url = QueryHelpers.AddQueryString("/api/orders", queryParams);
 var response = await _httpClient.GetAsync(url);
 ```
 
