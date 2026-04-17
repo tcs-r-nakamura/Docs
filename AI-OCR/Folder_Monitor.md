@@ -368,65 +368,71 @@ POST /v1/folder-monitor/watchers/1/sync
 
 ## ドメイン構成
 
-- api/folder_monitor/
-  ├── domain/
-  │   ├── aggregates/
-  │   │   └── folder_watcher.py            # FolderWatcher集約・FolderWatcherRuleエンティティ
-  │   ├── value_objects/
-  │   │   ├── folder_watcher_id.py         # WatcherIdの型定義
-  │   │   └── folder_rule_id.py            # RuleIdの型定義
-  │   └── repositories/
-  │       ├── watcher_repository.py        # WatcherRepository（IF）
-  │       └── file_log_repository.py       # FileLogRepository（IF）
-  ├── application/
-  │   ├── _engine_resolver.py              # エンジン情報解決（mail_monitorと同様）
-  │   ├── create_watcher_use_case.py
-  │   ├── list_watchers_use_case.py
-  │   ├── get_watcher_use_case.py
-  │   ├── update_watcher_use_case.py
-  │   ├── archive_watcher_use_case.py
-  │   ├── add_rule_use_case.py
-  │   ├── list_rules_use_case.py
-  │   ├── get_rule_use_case.py
-  │   ├── update_rule_use_case.py
-  │   ├── remove_rule_use_case.py
-  │   ├── record_file_log_use_case.py
-  │   ├── list_file_logs_use_case.py
-  │   └── scan_watcher_use_case.py         # 手動スキャン
-  ├── infrastructure/
-  │   ├── persistence/
-  │   │   ├── models/
-  │   │   │   └── folder_monitor_models.py
-  │   │   ├── watcher_repository_impl.py
-  │   │   └── file_log_repository_impl.py
-  │   └── watching/
-  │       └── folder_event_worker.py       # watchdog Observer管理・イベントハンドラー
-  └── presentation/
-      ├── dependencies.py
-      ├── requests.py
-      ├── responses.py
-      └── router.py
+```
+api/folder_monitor/
+├── domain/
+│   ├── aggregates/
+│   │   └── folder_watcher.py            # FolderWatcher集約・FolderWatcherRuleエンティティ
+│   ├── value_objects/
+│   │   ├── folder_watcher_id.py         # WatcherIdの型定義
+│   │   └── folder_rule_id.py            # RuleIdの型定義
+│   └── repositories/
+│       ├── watcher_repository.py        # WatcherRepository（IF）
+│       └── file_log_repository.py       # FileLogRepository（IF）
+├── application/
+│   ├── _engine_resolver.py              # エンジン情報解決（mail_monitorと同様）
+│   ├── create_watcher_use_case.py
+│   ├── list_watchers_use_case.py
+│   ├── get_watcher_use_case.py
+│   ├── update_watcher_use_case.py
+│   ├── archive_watcher_use_case.py
+│   ├── add_rule_use_case.py
+│   ├── list_rules_use_case.py
+│   ├── get_rule_use_case.py
+│   ├── update_rule_use_case.py
+│   ├── remove_rule_use_case.py
+│   ├── record_file_log_use_case.py
+│   ├── list_file_logs_use_case.py
+│   └── scan_watcher_use_case.py         # 手動スキャン
+├── infrastructure/
+│   ├── persistence/
+│   │   ├── models/
+│   │   │   └── folder_monitor_models.py
+│   │   ├── watcher_repository_impl.py
+│   │   └── file_log_repository_impl.py
+│   └── watching/
+│       └── folder_event_worker.py       # watchdog Observer管理・イベントハンドラー
+└── presentation/
+    ├── dependencies.py
+    ├── requests.py
+    ├── responses.py
+    └── router.py
+```
 
 ## エラーハンドリング
 
-- `404 Not Found` | Watcher・Rule が存在しない |
-   `409 Conflict` | 同名のWatcherが既に存在する |
-   `422 Unprocessable Entity` | バリデーションエラー（必須項目未入力・文字数超過など） |
+| ステータスコード | 説明 |
+| --- | --- |
+| `404 Not Found` | Watcher・Rule が存在しない |
+| `409 Conflict` | 同名のWatcherが既に存在する |
+| `422 Unprocessable Entity` | バリデーションエラー（必須項目未入力・文字数超過など） |
 
 ## 処理フロー
 
--[アプリ起動時]
-    └─ DBからWatcher一覧を取得 → watchdog Observer登録・起動
+```
+[アプリ起動時]
+└─ DBからWatcher一覧を取得 → watchdog Observer登録・起動
 
-  [ファイル検知時]
-    └─ 対応形式チェック
-    └─ 処理済みチェック
-    └─ ルールマッチング
-         ├─ マッチあり → OCRジョブ投入 → 結果記録
-         └─ マッチなし → no_match記録
+[ファイル検知時]
+└─ 対応形式チェック
+└─ 処理済みチェック
+└─ ルールマッチング
+     ├─ マッチあり → OCRジョブ投入 → 結果記録
+     └─ マッチなし → no_match記録
 
-  [Watcher作成・削除時]
-    └─ Observerへの登録・解除をリアルタイムで反映
+[Watcher作成・削除時]
+└─ Observerへの登録・解除をリアルタイムで反映
 
-  [アプリ終了時]
-    └─ Observer停止
+[アプリ終了時]
+└─ Observer停止
+```
