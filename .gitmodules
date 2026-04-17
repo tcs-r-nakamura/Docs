@@ -1,6 +1,0 @@
-[submodule "AI"]
-	path = AI
-	url = https://github.com/tcs-r-nakamura/AI.git
-[submodule "AI-OCR"]
-	path = AI-OCR
-	url = https://github.com/tcs-r-nakamura/AI-OCR.git
