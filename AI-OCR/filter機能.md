@@ -192,7 +192,7 @@ partial void OnDateFromChanged(DateTime? value)
 }
 ```
 
-`SwapMessage` はダイアログ内に一時表示し、次回入力変更時（`OnDateFromChanged` / `OnDateToChanged` の冒頭）にクリアする。
+`SwapMessage` はダイアログ内に一時表示し、次回入力変更時（`OnDateFromChanged` / `OnDateToChanged` の冒頭）またはダイアログを開いたとき（`OpenDateFilter`）にクリアする。
 
 ---
 
@@ -258,7 +258,11 @@ public IEnumerable<JobHistoryItemViewModel> FilteredJobHistory
 }
 
 [RelayCommand]
-private void OpenDateFilter() => IsDateFilterVisible = true;
+private void OpenDateFilter()
+{
+    SwapMessage = null;   // ダイアログを開くたびに前回の通知を消す
+    IsDateFilterVisible = true;
+}
 
 [RelayCommand]
 private void CloseDateFilter() => IsDateFilterVisible = false;
